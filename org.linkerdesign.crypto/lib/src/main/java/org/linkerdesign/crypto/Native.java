@@ -45,7 +45,7 @@ public class Native {
 
   static {
     try {
-      var loader = new NativeLoader();
+      NativeLoader loader = new NativeLoader();
       loader.addWindowsLibraries("/native/win", List.of("libcrypto-3-x64.dll","kcrypto.dll"));
       loader.addLinuxLibraries("/native/linux", List.of("libkcrypto.so"));
       loader.loadFromJar();

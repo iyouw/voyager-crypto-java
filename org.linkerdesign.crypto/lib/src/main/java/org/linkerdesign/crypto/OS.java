@@ -6,8 +6,8 @@ public class OS {
   public static final String MACOS = "Mac";
 
   public static OsType get() {
-    var osName = System.getProperty("os.name");
-    var res = OsType.UNKNOW;
+    String osName = System.getProperty("os.name");
+    OsType res = OsType.UNKNOW;
     if (null != osName) {
       if (osName.startsWith(WINDOWS)) {
         res = OsType.WINDOWS;

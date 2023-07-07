@@ -63,8 +63,8 @@ public enum OsType {
 
   public String resolveLibrayName(String name) {
     if (null == name) return name;
-    var prefix = getPrefix();
-    var suffix = getSuffix();
+    String prefix = getPrefix();
+    String suffix = getSuffix();
     if (!name.startsWith(prefix)) {
       name = prefix + name;
     }

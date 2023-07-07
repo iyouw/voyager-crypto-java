@@ -31,9 +31,9 @@ public class StreamReader implements Reader {
   }
 
   public byte[] read(int length) {
-    var size = Math.min(length, (int)getAvailable());
+    int size = Math.min(length, (int)getAvailable());
     if (size == 0) return null;
-    var res = new byte[size];
+    byte[] res = new byte[size];
     try {
       _stream.readNBytes(res, 0, size);
       return res;

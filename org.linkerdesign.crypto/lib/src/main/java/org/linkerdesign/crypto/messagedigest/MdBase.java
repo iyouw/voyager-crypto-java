@@ -52,37 +52,37 @@ public abstract class MdBase extends CryptoBase {
 
   public String digest(byte[] bytes, ExportType exportType)
    throws UnsupportedEncodingException{
-    var algorithm = getAlgorithm();
+    MdAlgorithm algorithm = getAlgorithm();
     return digestCore(bytes, algorithm, exportType, DEFAULT_BUFFER_SIZE);
   }
 
   public String digest(byte[] bytes, ExportType exportType, int bufferSize)
    throws UnsupportedEncodingException{
-    var algorithm = getAlgorithm();
+    MdAlgorithm algorithm = getAlgorithm();
     return digestCore(bytes, algorithm, exportType, bufferSize);
   }
 
   public byte[] digest(InputStream stream)
   {
-    var algorithm = getAlgorithm();
+    MdAlgorithm algorithm = getAlgorithm();
     return digestCore(stream, algorithm, DEFAULT_BUFFER_SIZE);
   }
 
   public byte[] digest(InputStream stream, int bufferSize)
   {
-    var algorithm = getAlgorithm();
+    MdAlgorithm algorithm = getAlgorithm();
     return digestCore(stream, algorithm, bufferSize);
   }
 
   public String digest(InputStream stream, ExportType exportType)
     throws UnsupportedEncodingException {
-    var algorithm = getAlgorithm();
+    MdAlgorithm algorithm = getAlgorithm();
     return digestCore(stream, algorithm, exportType, DEFAULT_BUFFER_SIZE);
   }
 
   public String digest(InputStream stream, ExportType exportType, int bufferSize)
     throws UnsupportedEncodingException {
-    var algorithm = getAlgorithm();
+    MdAlgorithm algorithm = getAlgorithm();
     return digestCore(stream, algorithm, exportType, bufferSize);
   }
 

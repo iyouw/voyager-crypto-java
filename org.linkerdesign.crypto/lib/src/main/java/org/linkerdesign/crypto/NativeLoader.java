@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.print.DocFlavor.STRING;
+
 public class NativeLoader {
   public static String TEMPORARY_DIR_NAME = "org.linkerdesign.crypto.lib";
 
@@ -55,10 +57,10 @@ public class NativeLoader {
   }
 
   public void loadFromJar() throws IOException {
-    var osType = OS.get();
-    var libs = libraries.get(osType);
+    OsType osType = OS.get();
+    List<String> libs = libraries.get(osType);
     if (null == libs) return;
-    for(var lib : libs) {
+    for(String lib : libs) {
       loadFromJar(lib);
     }
   }

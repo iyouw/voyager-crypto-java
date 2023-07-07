@@ -16,8 +16,8 @@ public class Utils {
   }
 
   public static File createTempDirectory(String name) throws IOException {
-    var tempDir = System.getProperty("java.io.tmpdir");
-    var dir = new File(tempDir, name + System.nanoTime());
+    String tempDir = System.getProperty("java.io.tmpdir");
+    File dir = new File(tempDir, name + System.nanoTime());
     if (!dir.mkdir())
       throw new IOException("Failed to create temp dir" + dir.getName());
     return dir;
