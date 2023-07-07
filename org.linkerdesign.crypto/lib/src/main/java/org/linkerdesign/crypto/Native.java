@@ -2,7 +2,7 @@ package org.linkerdesign.crypto;
 
 import java.util.List;
 
-public class Native {
+class Native {
   private ReadCallback _readCallback;
 
   private WriteCallback _writeCallback;

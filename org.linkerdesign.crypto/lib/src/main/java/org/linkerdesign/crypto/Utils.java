@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 
-public class Utils {
+class Utils {
   public static boolean isPosixCompliant() {
     try {
       return FileSystems.getDefault()

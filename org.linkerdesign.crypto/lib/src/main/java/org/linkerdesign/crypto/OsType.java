@@ -1,6 +1,6 @@
 package org.linkerdesign.crypto;
 
-public enum OsType {
+enum OsType {
   WINDOWS (1) {
     @Override
     public boolean isWindows() {

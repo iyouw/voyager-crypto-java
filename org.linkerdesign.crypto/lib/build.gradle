@@ -11,6 +11,7 @@ plugins {
     id 'java-library'
     // id 'application'
     id 'maven-publish'
+    id 'signing'
 }
 
 repositories {
@@ -27,6 +28,10 @@ dependencies {
 java {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
+
+    withJavadocJar()
+    withSourcesJar()
+
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
@@ -34,26 +39,48 @@ java {
 
 publishing {
     publications {
-        maven(MavenPublication) {
-            groupId = "org.linkerdesign"
+        mavenJava(MavenPublication) {
+            groupId = "io.github.iyouw"
             artifactId = "crypto"
             version = '0.2.4'
             from components.java
+
+            pom {
+                name = 'org.linkerdesign.crypto'
+                description = 'A lightweight crypto library which could run on `browser`, `node`, `java(jvm)`, `dotnet` platform base on `openssl libcrypto library`.'
+                
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'johnd'
+                        name = 'John Doe'
+                        email = 'john.doe@example.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/iyouw/voyager-crypto-java.git'
+                    developerConnection = 'scm:git:ssh://github.com/iyouw/voyager-crypto-java.git'
+                    url = 'https://github.com/iyouw/voyager-crypto-java'
+                }
+            }
         }
     }
 
     repositories {
         maven {
-            name = "release"
-            url = "http://192.1.2.235:8081/nexus/content/repositories/releases"
-            allowInsecureProtocol = true
-
-            credentials {
-                username = "admin"
-                password = "admin123"
-            }
+            name = "OSSRH"
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
         }
     }
+}
+
+signing {
+    sign(publishing.publications.mavenJava)
 }
 
 tasks.named('test') {

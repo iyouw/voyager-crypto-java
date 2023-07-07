@@ -5,9 +5,17 @@ import java.io.UnsupportedEncodingException;
 import org.linkerdesign.crypto.abstraction.BinaryDecoder;
 import org.linkerdesign.crypto.abstraction.ExportType;
 
+/**
+ * binary decode strategy 
+ */
 public class BinaryDecodeStrategy implements BinaryDecoder {
   private final BinaryDecoder _decoder;
 
+  /**
+   * the binary decode strategy constructor
+   * @param exportType encoding type
+   * @throws UnsupportedEncodingException UnsupportedEncoding
+   */
   public BinaryDecodeStrategy(ExportType exportType) 
     throws UnsupportedEncodingException {
     switch(exportType) {
@@ -25,6 +33,9 @@ public class BinaryDecodeStrategy implements BinaryDecoder {
     }
   }
 
+  /**
+   * decode
+   */
   public byte[] decode(String text) {
     return _decoder.decode(text);
   }

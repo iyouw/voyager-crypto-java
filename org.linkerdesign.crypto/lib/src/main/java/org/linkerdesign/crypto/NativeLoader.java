@@ -11,9 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.print.DocFlavor.STRING;
-
-public class NativeLoader {
+class NativeLoader {
   public static String TEMPORARY_DIR_NAME = "org.linkerdesign.crypto.lib";
 
   private static File tempDir;

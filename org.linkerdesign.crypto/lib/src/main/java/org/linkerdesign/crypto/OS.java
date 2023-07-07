@@ -1,6 +1,6 @@
 package org.linkerdesign.crypto;
 
-public class OS {
+class OS {
   public static final String WINDOWS = "Windows";
   public static final String LINUX = "Linux";
   public static final String MACOS = "Mac";
