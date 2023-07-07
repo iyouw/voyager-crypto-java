@@ -46,6 +46,7 @@ publishing {
 			pom {
 				name = 'org.linkerdesign.crypto'
 				description = 'A lightweight crypto library which could run on `browser`, `node`, `java(jvm)`, `dotnet` platform base on `openssl libcrypto library`.'
+				url = 'https://github.com/iyouw/voyager-crypto-java'
 				licenses {
 					license {
 						name = 'The Apache License, Version 2.0'
