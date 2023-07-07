@@ -14,73 +14,70 @@ plugins {
 }
 
 repositories {
-    // Use Maven Central for resolving dependencies.
-    mavenCentral()
+	// Use Maven Central for resolving dependencies.
+	mavenCentral()
 }
 
 dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
+	// Use JUnit Jupiter for testing.
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+	sourceCompatibility = 1.8
+	targetCompatibility = 1.8
 
-    withJavadocJar()
-    withSourcesJar()
+	withJavadocJar()
+	withSourcesJar()
 
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
 }
 
 publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId = "io.github.iyouw"
-            artifactId = "crypto"
-            version = '0.2.4'
-            from components.java
+	publications {
+		mavenJava(MavenPublication) {
+			groupId = "io.github.iyouw"
+			artifactId = "crypto"
+			version = '0.2.4'
+			from components.java
+			pom {
+				name = 'org.linkerdesign.crypto'
+				description = 'A lightweight crypto library which could run on `browser`, `node`, `java(jvm)`, `dotnet` platform base on `openssl libcrypto library`.'
+				licenses {
+					license {
+						name = 'The Apache License, Version 2.0'
+						url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+					}
+				}
+				scm {
+					connection = 'scm:git:git://github.com/iyouw/voyager-crypto-java.git'
+					developerConnection = 'scm:git:ssh://github.com/iyouw/voyager-crypto-java.git'
+					url = 'https://github.com/iyouw/voyager-crypto-java'
+				}
+			}
+		}
+	}
 
-            pom {
-                name = 'org.linkerdesign.crypto'
-                description = 'A lightweight crypto library which could run on `browser`, `node`, `java(jvm)`, `dotnet` platform base on `openssl libcrypto library`.'
-                
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:git://github.com/iyouw/voyager-crypto-java.git'
-                    developerConnection = 'scm:git:ssh://github.com/iyouw/voyager-crypto-java.git'
-                    url = 'https://github.com/iyouw/voyager-crypto-java'
-                }
-            }
-        }
-    }
+	repositories {
+		maven {
+			name = "OSSRH"
+			url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
 
-    repositories {
-        maven {
-            name = "OSSRH"
-            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-
-            credentials {
-                username = findProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
-                password = findProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
-            }
-        }
-    }
+			credentials {
+				username = findProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
+				password = findProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
+			}
+		}
+	}
 }
 
 signing {
-    sign(publishing.publications.mavenJava)
+  sign(publishing.publications.mavenJava)
 }
 
 tasks.named('test') {
-    // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
+  useJUnitPlatform()
 }
