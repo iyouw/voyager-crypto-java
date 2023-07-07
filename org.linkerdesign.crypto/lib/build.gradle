@@ -9,7 +9,6 @@
 plugins {
     // Apply the java-library plugin for API and implementation separation.
     id 'java-library'
-    // id 'application'
     id 'maven-publish'
     id 'signing'
 }
@@ -55,13 +54,6 @@ publishing {
                         url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
-                developers {
-                    developer {
-                        id = 'johnd'
-                        name = 'John Doe'
-                        email = 'john.doe@example.com'
-                    }
-                }
                 scm {
                     connection = 'scm:git:git://github.com/iyouw/voyager-crypto-java.git'
                     developerConnection = 'scm:git:ssh://github.com/iyouw/voyager-crypto-java.git'
@@ -75,6 +67,11 @@ publishing {
         maven {
             name = "OSSRH"
             url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+
+            credentials {
+                username = findProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
+                password = findProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
+            }
         }
     }
 }
