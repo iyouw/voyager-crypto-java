@@ -37,7 +37,7 @@ publishing {
         maven(MavenPublication) {
             groupId = "org.linkerdesign"
             artifactId = "crypto"
-            version = '0.0.6'
+            version = '0.2.4'
             from components.java
         }
     }
@@ -46,10 +46,11 @@ publishing {
         maven {
             name = "release"
             url = "http://192.1.2.235:8081/nexus/content/repositories/releases"
+            allowInsecureProtocol = true
 
             credentials {
-                username = "${NEXUS_USERNAME}"
-                password = "${NEXUS_PASSWORD}"
+                username = "admin"
+                password = "admin123"
             }
         }
     }

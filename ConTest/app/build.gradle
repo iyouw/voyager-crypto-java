@@ -12,9 +12,14 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
+    // mavenLocal()
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+
+    maven {
+        allowInsecureProtocol = true
+        url = "http://192.1.2.235:8081/nexus/content/repositories/releases"
+    }
 }
 
 dependencies {
@@ -23,7 +28,7 @@ dependencies {
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:31.1-jre'
-    implementation 'org.linkerdesign:crypto:0.0.5'
+    implementation 'org.linkerdesign:crypto:0.2.4'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
