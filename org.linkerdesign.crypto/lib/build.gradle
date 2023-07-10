@@ -53,6 +53,13 @@ publishing {
 						url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
 					}
 				}
+				developers {
+					developer {
+						id = 'iwander'
+						name = 'iwander'
+						email = '2317791932@qq.com'
+					}
+				}
 				scm {
 					connection = 'scm:git:git://github.com/iyouw/voyager-crypto-java.git'
 					developerConnection = 'scm:git:ssh://github.com/iyouw/voyager-crypto-java.git'
