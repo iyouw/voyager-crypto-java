@@ -10,15 +10,12 @@ import org.linkerdesign.crypto.abstraction.Reader;
 public class StreamReader implements Reader {
   private InputStream _stream;
 
-  private long _length;
-
   /**
    * stream reader constructor
    * @param stream stream
    */
   public StreamReader(InputStream stream) {
     _stream = stream;
-    _length = getAvailable();
   }
 
   /**
@@ -29,18 +26,12 @@ public class StreamReader implements Reader {
     return _stream;
   }
 
-  /**
-   * get stream length
-   */
-  public long getLength() {
-    return _length;
-  }
 
   /**
    * get remaining length of stream data
    * @return remaing length
    */
-  public long getAvailable() {
+  public int getAvailable() {
     try {
       return _stream.available();
     } catch (Exception e) {
@@ -52,7 +43,7 @@ public class StreamReader implements Reader {
    * read data
    */
   public byte[] read(int length) {
-    int size = Math.min(length, (int)getAvailable());
+    int size = Math.min(length, getAvailable());
     if (size == 0) return null;
     byte[] res = new byte[size];
     try {

@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     org_linkerdesign_crypto_Native
  * Method:    digest
- * Signature: (II)[B
+ * Signature: (IILorg/linkerdesign/crypto/ReadCallback;)[B
  */
 JNIEXPORT jbyteArray JNICALL Java_org_linkerdesign_crypto_Native_digest
-  (JNIEnv *, jobject, jint, jint);
+  (JNIEnv *, jobject, jint, jint, jobject);
 
 /*
  * Class:     org_linkerdesign_crypto_Native
@@ -34,18 +34,18 @@ JNIEXPORT jbyteArray JNICALL Java_org_linkerdesign_crypto_Native_generateAesIV
 /*
  * Class:     org_linkerdesign_crypto_Native
  * Method:    aesEncrypt
- * Signature: (I[B[BI)[B
+ * Signature: (I[B[BILorg/linkerdesign/crypto/ReadCallback;Lorg/linkerdesign/crypto/WriteCallback;)I
  */
-JNIEXPORT jbyteArray JNICALL Java_org_linkerdesign_crypto_Native_aesEncrypt
-  (JNIEnv *, jobject, jint, jbyteArray, jbyteArray, jint);
+JNIEXPORT jint JNICALL Java_org_linkerdesign_crypto_Native_aesEncrypt
+  (JNIEnv *, jobject, jint, jbyteArray, jbyteArray, jint, jobject, jobject);
 
 /*
  * Class:     org_linkerdesign_crypto_Native
  * Method:    aesDecrypt
- * Signature: (I[B[BI)[B
+ * Signature: (I[B[BILorg/linkerdesign/crypto/ReadCallback;Lorg/linkerdesign/crypto/WriteCallback;)I
  */
-JNIEXPORT jbyteArray JNICALL Java_org_linkerdesign_crypto_Native_aesDecrypt
-  (JNIEnv *, jobject, jint, jbyteArray, jbyteArray, jint);
+JNIEXPORT jint JNICALL Java_org_linkerdesign_crypto_Native_aesDecrypt
+  (JNIEnv *, jobject, jint, jbyteArray, jbyteArray, jint, jobject, jobject);
 
 #ifdef __cplusplus
 }

@@ -1,9 +1,7 @@
 package org.linkerdesign.crypto.datatype;
 
-import java.io.UnsupportedEncodingException;
-
 import org.linkerdesign.crypto.abstraction.BinaryEncoder;
-import org.linkerdesign.crypto.abstraction.ExportType;
+import org.linkerdesign.crypto.abstraction.EncodingType;
 
 /**
  * binary encode strategy
@@ -14,10 +12,8 @@ public class BinaryEncodeStrategy implements BinaryEncoder {
   /**
    * the binary encode strategy constructor
    * @param exportType encoding
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  public BinaryEncodeStrategy(ExportType exportType)
-    throws UnsupportedEncodingException {
+  public BinaryEncodeStrategy(EncodingType exportType) {
     switch(exportType) {
       case Base64:
         _encoder = new Base64();
@@ -29,7 +25,7 @@ public class BinaryEncodeStrategy implements BinaryEncoder {
         _encoder = new Utf8();
         break;
       default:
-        throw new UnsupportedEncodingException();
+        _encoder = new Base64();
     }
   }
 

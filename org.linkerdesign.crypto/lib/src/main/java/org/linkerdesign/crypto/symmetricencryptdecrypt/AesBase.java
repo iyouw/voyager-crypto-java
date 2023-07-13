@@ -1,22 +1,23 @@
 package org.linkerdesign.crypto.symmetricencryptdecrypt;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
 import org.linkerdesign.crypto.CryptoBase;
 import org.linkerdesign.crypto.ReadCallback;
+import org.linkerdesign.crypto.WriteCallback;
 import org.linkerdesign.crypto.abstraction.AesKeySize;
 import org.linkerdesign.crypto.abstraction.AesMode;
-import org.linkerdesign.crypto.abstraction.ExportType;
+import org.linkerdesign.crypto.abstraction.EncodingType;
 import org.linkerdesign.crypto.abstraction.Reader;
 import org.linkerdesign.crypto.datatype.BinaryDecodeStrategy;
 import org.linkerdesign.crypto.datatype.BinaryEncodeStrategy;
 import org.linkerdesign.crypto.reader.ReaderStrategy;
+import org.linkerdesign.crypto.store.ByteArrayList;
 
 /**
  * aes base 
  */
-class AesBase extends CryptoBase {
+public class AesBase extends CryptoBase {
   /**
    * aes encrypt with reader
    * @param reader data reader
@@ -26,9 +27,12 @@ class AesBase extends CryptoBase {
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
    */
-  protected byte[] encryptCore(Reader reader, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
+  public byte[] encryptCore(Reader reader, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
+    ByteArrayList res = new ByteArrayList();
     ReadCallback readCallback = (int length) -> reader.read(length);
-    return aesEncryptNative(bufferSize, key, iv, mode, readCallback);
+    WriteCallback writeCallback = (byte[] bytes) -> res.add(bytes);
+    aesEncryptNative(bufferSize, key, iv, mode, readCallback, writeCallback);
+    return res.toArray();
   }
 
   /**
@@ -40,7 +44,7 @@ class AesBase extends CryptoBase {
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
    */
-  protected byte[] encryptCore(byte[] data, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
+  public byte[] encryptCore(byte[] data, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
     Reader reader = new ReaderStrategy(data);
     return encryptCore(reader, key, iv, mode, bufferSize);
   }
@@ -55,10 +59,8 @@ class AesBase extends CryptoBase {
    * @param mode aes mode
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected byte[] encryptCore(byte[] data, String key, ExportType keyType, String iv, ExportType ivType, AesMode mode, int bufferSize)
-    throws UnsupportedEncodingException {
+  public byte[] encryptCore(byte[] data, String key, EncodingType keyType, String iv, EncodingType ivType, AesMode mode, int bufferSize) {
     BinaryDecodeStrategy strategy = new BinaryDecodeStrategy(keyType);
     byte[] keyData = strategy.decode(key);
 
@@ -77,10 +79,8 @@ class AesBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result 
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String encryptCore(byte[] data, byte[] key, byte[] iv, AesMode mode, ExportType exportType, int bufferSize)
-    throws UnsupportedEncodingException {
+  public String encryptCore(byte[] data, byte[] key, byte[] iv, AesMode mode, EncodingType exportType, int bufferSize) {
     byte[] bytes = encryptCore(data, key, iv, mode, bufferSize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);
@@ -97,10 +97,8 @@ class AesBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String encryptCore(byte[] data, String key, ExportType keyType, String iv, ExportType ivType, AesMode mode, ExportType exportType, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public String encryptCore(byte[] data, String key, EncodingType keyType, String iv, EncodingType ivType, AesMode mode, EncodingType exportType, int bufferSize) {
     byte[] bytes = encryptCore(data, key, keyType, iv, ivType, mode, bufferSize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);
@@ -115,10 +113,8 @@ class AesBase extends CryptoBase {
    * @param mode aes mode
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected byte[] encryptCore(String data, ExportType dataType, byte[] key, byte[] iv, AesMode mode, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public byte[] encryptCore(String data, EncodingType dataType, byte[] key, byte[] iv, AesMode mode, int bufferSize)  {
     Reader reader = new ReaderStrategy(data, dataType);
     return encryptCore(reader, key, iv, mode, bufferSize);
   }
@@ -134,10 +130,8 @@ class AesBase extends CryptoBase {
    * @param mode aes mode
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected byte[] encryptCore(String data, ExportType dataType, String key, ExportType keyType, String iv, ExportType ivType, AesMode mode, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public byte[] encryptCore(String data, EncodingType dataType, String key, EncodingType keyType, String iv, EncodingType ivType, AesMode mode, int bufferSize) {
     BinaryDecodeStrategy strategy = new BinaryDecodeStrategy(keyType);
     byte[] keyData = strategy.decode(key);
 
@@ -157,10 +151,8 @@ class AesBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String encryptCore(String data, ExportType dataType, byte[] key, byte[] iv, AesMode mode, ExportType exportType, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public String encryptCore(String data, EncodingType dataType, byte[] key, byte[] iv, AesMode mode, EncodingType exportType, int bufferSize) {
     byte[] bytes = encryptCore(data, dataType, key, iv, mode, bufferSize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);
@@ -178,10 +170,8 @@ class AesBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String encryptCore(String data, ExportType dataType, String key, ExportType keyType, String iv, ExportType ivType, AesMode mode, ExportType exportType, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public String encryptCore(String data, EncodingType dataType, String key, EncodingType keyType, String iv, EncodingType ivType, AesMode mode, EncodingType exportType, int bufferSize) {
     byte[] bytes = encryptCore(data, dataType, key, keyType, iv, ivType, mode, bufferSize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);
@@ -196,7 +186,7 @@ class AesBase extends CryptoBase {
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
    */
-  protected byte[] encryptCore(InputStream data, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
+  public byte[] encryptCore(InputStream data, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
     Reader reader = new ReaderStrategy(data);
     return encryptCore(reader, key, iv, mode, bufferSize);
   }
@@ -211,10 +201,8 @@ class AesBase extends CryptoBase {
    * @param mode aes mode
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected byte[] encryptCore(InputStream data, String key, ExportType keyType, String iv, ExportType ivType, AesMode mode, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public byte[] encryptCore(InputStream data, String key, EncodingType keyType, String iv, EncodingType ivType, AesMode mode, int bufferSize) {
     BinaryDecodeStrategy strategy = new BinaryDecodeStrategy(keyType);
     byte[] keyData = strategy.decode(key);
 
@@ -233,10 +221,8 @@ class AesBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String encryptCore(InputStream data, byte[] key, byte[] iv, AesMode mode, ExportType exportType, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public String encryptCore(InputStream data, byte[] key, byte[] iv, AesMode mode, EncodingType exportType, int bufferSize) {
     byte[] bytes = encryptCore(data, key, iv, mode, bufferSize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);
@@ -253,10 +239,8 @@ class AesBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String encryptCore(InputStream data, String key, ExportType keyType, String iv, ExportType ivType, AesMode mode, ExportType exportType, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public String encryptCore(InputStream data, String key, EncodingType keyType, String iv, EncodingType ivType, AesMode mode, EncodingType exportType, int bufferSize) {
     byte[] bytes = encryptCore(data, key, keyType, iv, ivType, mode, bufferSize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);
@@ -271,9 +255,12 @@ class AesBase extends CryptoBase {
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
    */
-  protected byte[] decryptCore(Reader reader, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
+  public byte[] decryptCore(Reader reader, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
+    ByteArrayList res = new ByteArrayList();
     ReadCallback readCallback = (int length) -> reader.read(length);
-    return aesDecryptNative(bufferSize, key, iv, mode, readCallback);
+    WriteCallback writeCallback = (byte[] bytes) -> res.add(bytes);
+    aesDecryptNative(bufferSize, key, iv, mode, readCallback, writeCallback);
+    return res.toArray();
   }
 
   /**
@@ -285,7 +272,7 @@ class AesBase extends CryptoBase {
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
    */
-  protected byte[] decryptCore(byte[] data, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
+  public byte[] decryptCore(byte[] data, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
     Reader reader = new ReaderStrategy(data);
     return decryptCore(reader, key, iv, mode, bufferSize);
   }
@@ -300,10 +287,8 @@ class AesBase extends CryptoBase {
    * @param mode aes mode
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected byte[] decryptCore(byte[] data, String key, ExportType keyType, String iv, ExportType ivType, AesMode mode, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public byte[] decryptCore(byte[] data, String key, EncodingType keyType, String iv, EncodingType ivType, AesMode mode, int bufferSize) {
     BinaryDecodeStrategy strategy = new BinaryDecodeStrategy(keyType);
     byte[] keyData = strategy.decode(key);
 
@@ -322,10 +307,8 @@ class AesBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String decryptCore(byte[] data, byte[] key, byte[] iv, AesMode mode, ExportType exportType, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public String decryptCore(byte[] data, byte[] key, byte[] iv, AesMode mode, EncodingType exportType, int bufferSize) {
     byte[] bytes = decryptCore(data, key, iv, mode, bufferSize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);
@@ -342,10 +325,8 @@ class AesBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String decryptCore(byte[] data, String key, ExportType keyType, String iv, ExportType ivType, AesMode mode, ExportType exportType, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public String decryptCore(byte[] data, String key, EncodingType keyType, String iv, EncodingType ivType, AesMode mode, EncodingType exportType, int bufferSize) {
     byte[] bytes = decryptCore(data, key, keyType, iv, ivType, mode, bufferSize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);
@@ -360,10 +341,8 @@ class AesBase extends CryptoBase {
    * @param mode aes mode
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected byte[] decryptCore(String data, ExportType dataType, byte[] key, byte[] iv, AesMode mode, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public byte[] decryptCore(String data, EncodingType dataType, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
     Reader reader = new ReaderStrategy(data, dataType);
     return decryptCore(reader, key, iv, mode, bufferSize);
   }
@@ -379,10 +358,8 @@ class AesBase extends CryptoBase {
    * @param mode aes mode
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected byte[] decryptCore(String data, ExportType dataType, String key, ExportType keyType, String iv, ExportType ivType, AesMode mode, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public byte[] decryptCore(String data, EncodingType dataType, String key, EncodingType keyType, String iv, EncodingType ivType, AesMode mode, int bufferSize) {
     BinaryDecodeStrategy strategy = new BinaryDecodeStrategy(keyType);
     byte[] keyData = strategy.decode(key);
 
@@ -402,10 +379,8 @@ class AesBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result 
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String decryptCore(String data, ExportType dataType, byte[] key, byte[] iv, AesMode mode, ExportType exportType, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public String decryptCore(String data, EncodingType dataType, byte[] key, byte[] iv, AesMode mode, EncodingType exportType, int bufferSize) {
     byte[] bytes = decryptCore(data, dataType, key, iv, mode, bufferSize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);
@@ -423,10 +398,8 @@ class AesBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result 
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String decryptCore(String data, ExportType dataType, String key, ExportType keyType, String iv, ExportType ivType, AesMode mode, ExportType exportType, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public String decryptCore(String data, EncodingType dataType, String key, EncodingType keyType, String iv, EncodingType ivType, AesMode mode, EncodingType exportType, int bufferSize) {
     byte[] bytes = decryptCore(data, dataType, key, keyType, iv, ivType, mode, bufferSize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);
@@ -441,7 +414,7 @@ class AesBase extends CryptoBase {
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
    */
-  protected byte[] decryptCore(InputStream data, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
+  public byte[] decryptCore(InputStream data, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
     Reader reader = new ReaderStrategy(data);
     return decryptCore(reader, key, iv, mode, bufferSize);
   }
@@ -456,10 +429,8 @@ class AesBase extends CryptoBase {
    * @param mode aes mode
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result 
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected byte[] decryptCore(InputStream data, String key, ExportType keyType, String iv, ExportType ivType, AesMode mode, int bufferSize) 
-   throws UnsupportedEncodingException {
+  public byte[] decryptCore(InputStream data, String key, EncodingType keyType, String iv, EncodingType ivType, AesMode mode, int bufferSize) {
     BinaryDecodeStrategy strategy = new BinaryDecodeStrategy(keyType);
     byte[] keyData = strategy.decode(key);
 
@@ -478,10 +449,8 @@ class AesBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String decryptCore(InputStream data, byte[] key, byte[] iv, AesMode mode, ExportType exportType, int bufferSize) 
-    throws UnsupportedEncodingException {
+  public String decryptCore(InputStream data, byte[] key, byte[] iv, AesMode mode, EncodingType exportType, int bufferSize) {
     byte[] bytes = decryptCore(data, key, iv, mode, bufferSize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);
@@ -498,10 +467,8 @@ class AesBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String decryptCore(InputStream data, String key, ExportType keyType, String iv, ExportType ivType, AesMode mode, ExportType exportType,  int bufferSize) 
-   throws UnsupportedEncodingException {
+  public String decryptCore(InputStream data, String key, EncodingType keyType, String iv, EncodingType ivType, AesMode mode, EncodingType exportType,  int bufferSize) {
     byte[] bytes = decryptCore(data, key, keyType, iv, ivType, mode, bufferSize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);
@@ -521,10 +488,8 @@ class AesBase extends CryptoBase {
    * @param keySize key size
    * @param exportType key encoding
    * @return aes key
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String generateKeyCore(AesKeySize keySize, ExportType exportType) 
-   throws UnsupportedEncodingException {
+  protected String generateKeyCore(AesKeySize keySize, EncodingType exportType) {
     byte[] bytes = generateKeyCore(keySize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);
@@ -542,10 +507,8 @@ class AesBase extends CryptoBase {
    * generate aes iv
    * @param exportType iv encoding
    * @return aes iv
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String generateIVCore(ExportType exportType)
-    throws UnsupportedEncodingException {
+  protected String generateIVCore(EncodingType exportType) {
     byte[] bytes = generateIVCore();
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);

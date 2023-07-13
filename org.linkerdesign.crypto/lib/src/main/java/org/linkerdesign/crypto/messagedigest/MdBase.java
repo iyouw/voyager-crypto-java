@@ -5,7 +5,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.linkerdesign.crypto.CryptoBase;
 import org.linkerdesign.crypto.ReadCallback;
-import org.linkerdesign.crypto.abstraction.ExportType;
+import org.linkerdesign.crypto.abstraction.EncodingType;
 import org.linkerdesign.crypto.abstraction.MdAlgorithm;
 import org.linkerdesign.crypto.abstraction.Reader;
 import org.linkerdesign.crypto.datatype.BinaryEncodeStrategy;
@@ -26,10 +26,8 @@ abstract class MdBase extends CryptoBase {
    * @param message message
    * @param msgType message encoding
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  public byte[] digest(String message, ExportType msgType)
-    throws UnsupportedEncodingException{
+  public byte[] digest(String message, EncodingType msgType) {
     MdAlgorithm algorithm = getAlgorithm();
     return digestCore(message, algorithm, msgType, DEFAULT_BUFFER_SIZE);
   }
@@ -40,10 +38,8 @@ abstract class MdBase extends CryptoBase {
    * @param msgType message encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  public byte[] digest(String message, ExportType msgType, int bufferSize)
-    throws UnsupportedEncodingException{
+  public byte[] digest(String message, EncodingType msgType, int bufferSize) {
     MdAlgorithm algorithm = getAlgorithm();
     return digestCore(message, algorithm, msgType, bufferSize);
   }
@@ -54,10 +50,8 @@ abstract class MdBase extends CryptoBase {
    * @param msgType message encoding
    * @param exportType result encoding
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  public String digest(String message, ExportType msgType, ExportType exportType)
-    throws UnsupportedEncodingException{
+  public String digest(String message, EncodingType msgType, EncodingType exportType) {
     MdAlgorithm algorithm = getAlgorithm();
     return digestCore(message, algorithm, msgType, exportType, DEFAULT_BUFFER_SIZE);
   }
@@ -69,10 +63,8 @@ abstract class MdBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  public String digest(String message, ExportType msgType, ExportType exportType , int bufferSize)
-    throws UnsupportedEncodingException{
+  public String digest(String message, EncodingType msgType, EncodingType exportType , int bufferSize) {
     MdAlgorithm algorithm = getAlgorithm();
     return digestCore(message, algorithm, msgType, exportType, bufferSize);
   }
@@ -81,10 +73,8 @@ abstract class MdBase extends CryptoBase {
    * digest
    * @param bytes message
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  public byte[] digest(byte[] bytes)
-    throws UnsupportedEncodingException{
+  public byte[] digest(byte[] bytes) {
     MdAlgorithm algorithm = getAlgorithm();
     return digestCore(bytes, algorithm, DEFAULT_BUFFER_SIZE);
   }
@@ -94,10 +84,8 @@ abstract class MdBase extends CryptoBase {
    * @param bytes message
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  public byte[] digest(byte[] bytes, int bufferSize)
-    throws UnsupportedEncodingException{
+  public byte[] digest(byte[] bytes, int bufferSize) {
     MdAlgorithm algorithm = getAlgorithm();
     return digestCore(bytes, algorithm, bufferSize);
   }
@@ -107,10 +95,8 @@ abstract class MdBase extends CryptoBase {
    * @param bytes message
    * @param exportType result encoding
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  public String digest(byte[] bytes, ExportType exportType)
-   throws UnsupportedEncodingException{
+  public String digest(byte[] bytes, EncodingType exportType) {
     MdAlgorithm algorithm = getAlgorithm();
     return digestCore(bytes, algorithm, exportType, DEFAULT_BUFFER_SIZE);
   }
@@ -121,10 +107,8 @@ abstract class MdBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  public String digest(byte[] bytes, ExportType exportType, int bufferSize)
-   throws UnsupportedEncodingException{
+  public String digest(byte[] bytes, EncodingType exportType, int bufferSize) {
     MdAlgorithm algorithm = getAlgorithm();
     return digestCore(bytes, algorithm, exportType, bufferSize);
   }
@@ -157,10 +141,8 @@ abstract class MdBase extends CryptoBase {
    * @param stream message
    * @param exportType result encoding
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  public String digest(InputStream stream, ExportType exportType)
-    throws UnsupportedEncodingException {
+  public String digest(InputStream stream, EncodingType exportType) {
     MdAlgorithm algorithm = getAlgorithm();
     return digestCore(stream, algorithm, exportType, DEFAULT_BUFFER_SIZE);
   }
@@ -171,10 +153,8 @@ abstract class MdBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  public String digest(InputStream stream, ExportType exportType, int bufferSize)
-    throws UnsupportedEncodingException {
+  public String digest(InputStream stream, EncodingType exportType, int bufferSize) {
     MdAlgorithm algorithm = getAlgorithm();
     return digestCore(stream, algorithm, exportType, bufferSize);
   }
@@ -210,10 +190,8 @@ abstract class MdBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String digestCore(byte[] msg, MdAlgorithm algorithm, ExportType exportType, int bufferSize) 
-    throws UnsupportedEncodingException {
+  protected String digestCore(byte[] msg, MdAlgorithm algorithm, EncodingType exportType, int bufferSize) {
     byte[] bytes = digestCore(msg, algorithm, bufferSize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);
@@ -226,10 +204,8 @@ abstract class MdBase extends CryptoBase {
    * @param msgType message encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected byte[] digestCore(String msg, MdAlgorithm algorithm, ExportType msgType, int bufferSize) 
-    throws UnsupportedEncodingException {
+  protected byte[] digestCore(String msg, MdAlgorithm algorithm, EncodingType msgType, int bufferSize) {
     Reader reader = new ReaderStrategy(msg, msgType);
     return digestCore(reader, algorithm, bufferSize);
   }
@@ -242,10 +218,8 @@ abstract class MdBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String digestCore(String msg, MdAlgorithm algorithm, ExportType msgType, ExportType exportType, int bufferSize) 
-    throws UnsupportedEncodingException {
+  protected String digestCore(String msg, MdAlgorithm algorithm, EncodingType msgType, EncodingType exportType, int bufferSize) {
     byte[] bytes = digestCore(msg, algorithm, msgType, bufferSize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);
@@ -270,10 +244,8 @@ abstract class MdBase extends CryptoBase {
    * @param exportType result encoding
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
    * @return result
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  protected String digestCore(InputStream msg, MdAlgorithm algorithm, ExportType exportType, int bufferSize) 
-    throws UnsupportedEncodingException {
+  protected String digestCore(InputStream msg, MdAlgorithm algorithm, EncodingType exportType, int bufferSize) {
     byte[] bytes = digestCore(msg, algorithm, bufferSize);
     BinaryEncodeStrategy strategy = new BinaryEncodeStrategy(exportType);
     return strategy.encode(bytes);

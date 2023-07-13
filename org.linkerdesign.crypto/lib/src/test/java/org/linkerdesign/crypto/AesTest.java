@@ -2,7 +2,7 @@ package org.linkerdesign.crypto;
 
 import org.junit.jupiter.api.Test;
 import org.linkerdesign.crypto.abstraction.AesKeySize;
-import org.linkerdesign.crypto.abstraction.ExportType;
+import org.linkerdesign.crypto.abstraction.EncodingType;
 import org.linkerdesign.crypto.symmetricencryptdecrypt.Aes;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,11 +15,11 @@ public class AesTest {
   @Test void testEncryptDecrypt() throws UnsupportedEncodingException {
     Aes aes = new Aes();
 
-    String key = aes.generateKey(AesKeySize.KS256, ExportType.Base64);
-    String iv = aes.generateIV(ExportType.Base64);
+    String key = aes.generateKey(AesKeySize.KS256, EncodingType.Base64);
+    String iv = aes.generateIV(EncodingType.Base64);
 
-    String enc = aes.encryptCBCWithUTF8(key, iv, msg, ExportType.Base64);
-    String dec = aes.decryptCBCWithUTF8(key, iv, enc, ExportType.Base64);
+    byte[] enc = aes.encrypt(key, iv, msg, EncodingType.UTF8);
+    String dec = aes.decrypt(key, iv, enc, EncodingType.UTF8);
 
     assertTrue(dec.equals(msg), "encrypt decrypt successful");
   }

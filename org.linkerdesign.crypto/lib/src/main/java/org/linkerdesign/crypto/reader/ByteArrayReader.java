@@ -8,13 +8,13 @@ import org.linkerdesign.crypto.abstraction.Reader;
  * byte array reader
  */
 public abstract class ByteArrayReader implements Reader {
-  private long _readedLength;
+  private int _readedLength;
 
   /**
    * the readed length of this reader
    * @return readed length
    */
-  public long getReadedLength() {
+  public int getReadedLength() {
     return _readedLength;
   }
 
@@ -22,7 +22,7 @@ public abstract class ByteArrayReader implements Reader {
    * set readed length
    * @param length readed length
    */
-  protected void setReadedLength(long length) {
+  protected void setReadedLength(int length) {
     _readedLength = length;
   }
 
@@ -33,9 +33,10 @@ public abstract class ByteArrayReader implements Reader {
   public abstract byte[] getSource();
 
   /**
-   * the length of the reader
+   * get the length of the reader
+   * @return the length of the reader
    */
-  public long getLength() {
+  public int getLength() {
     return getSource().length;
   }
 
@@ -43,7 +44,7 @@ public abstract class ByteArrayReader implements Reader {
    * the remaining data length of the reader
    * @return remaining data length
    */
-  public long getAvailable() {
+  public int getAvailable() {
     return getLength() - _readedLength;
   }
 
@@ -51,8 +52,8 @@ public abstract class ByteArrayReader implements Reader {
    * read data from source
    */
   public byte[] read(int length) {
-    int size = (int)Math.min(length, getAvailable());
+    int size = Math.min(length, getAvailable());
     if (size == 0) return null;
-    return Arrays.copyOfRange(getSource(), (int)_readedLength, (int)(_readedLength += size));
+    return Arrays.copyOfRange(getSource(), _readedLength, _readedLength += size);
   }
 }

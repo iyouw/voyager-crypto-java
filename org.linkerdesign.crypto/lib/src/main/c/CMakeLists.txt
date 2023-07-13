@@ -1,4 +1,4 @@
-add_library(kcrypto SHARED converter.c crypto_base.c stream.c native.c converter.h crypto_base.h stream.h)
+add_library(kcrypto SHARED converter.c crypto_base.c native.c converter.h crypto_base.h)
 
 # include directories
 set(OPENSSL_WIN "C:/Program Files/OpenSSL")

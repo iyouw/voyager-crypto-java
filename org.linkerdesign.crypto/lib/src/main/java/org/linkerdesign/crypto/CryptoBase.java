@@ -21,8 +21,8 @@ public class CryptoBase {
    * @return digest result
    */
   protected byte[] digestNative(int bufferLength, MdAlgorithm algorithm, ReadCallback readCallback) {
-    Native nat = new Native(readCallback);
-    return nat.digest(bufferLength, algorithm.getValue());
+    Native nat = new Native();
+    return nat.digest(bufferLength, algorithm.getValue(), readCallback);
   }
 
   /**
@@ -51,11 +51,12 @@ public class CryptoBase {
    * @param iv aes iv
    * @param mode aes mode
    * @param readCallback native data readcallback
-   * @return encrypt result
+   * @param writeCallback native data writecallbak
+   * @return encrypt result (0 is success, -1 is failed)
    */
-  protected byte[] aesEncryptNative(int bufferLength, byte[] key, byte[] iv, AesMode mode, ReadCallback readCallback) {
-    Native nat = new Native(readCallback);
-    return nat.aesEncrypt(bufferLength, key, iv, mode.getValue());
+  protected int aesEncryptNative(int bufferLength, byte[] key, byte[] iv, AesMode mode, ReadCallback readCallback, WriteCallback writeCallback) {
+    Native nat = new Native();
+    return nat.aesEncrypt(bufferLength, key, iv, mode.getValue(), readCallback, writeCallback);
   }
 
   /**
@@ -65,10 +66,11 @@ public class CryptoBase {
    * @param iv aes iv
    * @param mode aes mode
    * @param readCallback native data readcallbak
-   * @return decrypt result
+   * @param writeCallback native data writecallbak
+   * @return decrypt result (0 is success, -1 is failed)
    */
-  protected byte[] aesDecryptNative(int bufferLength, byte[] key, byte[] iv, AesMode mode, ReadCallback readCallback) {
-    Native nat = new Native(readCallback);
-    return nat.aesDecrypt(bufferLength, key, iv, mode.getValue());
+  protected int aesDecryptNative(int bufferLength, byte[] key, byte[] iv, AesMode mode, ReadCallback readCallback, WriteCallback writeCallback) {
+    Native nat = new Native();
+    return nat.aesDecrypt(bufferLength, key, iv, mode.getValue(), readCallback, writeCallback);
   }
 }

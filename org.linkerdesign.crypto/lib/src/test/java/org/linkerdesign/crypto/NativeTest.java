@@ -4,6 +4,8 @@
 package org.linkerdesign.crypto;
 
 import org.junit.jupiter.api.Test;
+import org.linkerdesign.crypto.store.ByteArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.UnsupportedEncodingException;
@@ -27,18 +29,20 @@ class NativeTest {
 		try {
 			String msg = "《青溪》是唐代诗人王维创作的一首五言古诗。此诗描写了一条青溪的幽秀景色，诗人用多彩的画笔，绘出青溪流经不同地方时呈现的不同画面。其中“声喧乱石中，色静深松里”两句，以喧响的声音和幽冷的色调形成闹与静的强烈对比，如同一幅“有声画”。诗的末四句写出诗人心境的闲谈正如清川的闲淡，把自己的精神和自然的精神融和起来，意味隽永。全诗自然清淡素雅，写景抒情皆轻轻松松，然而韵味却隽永醇厚。诗人笔下的青溪是喧闹与沉郁的统一，活泼与安详的揉合，幽深与素静的融和。";
 			byte[] bytes = msg.getBytes("UTF-8");
-			Native nat = new Native() {
-				int readLength = 0;
 
+			Native nat = new Native();
+			ReadCallback readCallback = new ReadCallback() {
+				int readLength = 0;
 				@Override
-				public byte[] readCallback(int length) {
-						int size = Math.min(length, bytes.length - readLength);
-						if (size == 0) return null;
-						return Arrays.copyOfRange(bytes, readLength, readLength += size);
+				public byte[] read(int length) {
+					int size = Math.min(length, bytes.length - readLength);
+					if (size == 0) return null;
+					return Arrays.copyOfRange(bytes, readLength, readLength += size);
 				}
 			};
 
-			byte[] hash = nat.digest(64 * 1024, 5);
+			byte[] hash = nat.digest(64 * 1024, 5, readCallback);
+			
 			assertTrue(hash != null, "hash is not null");
 			assertTrue(hash.length == 16, "hash's length is 16");
 		} catch (Exception e) {
@@ -50,37 +54,42 @@ class NativeTest {
 		try {
 			String msg = "《青溪》是唐代诗人王维创作的一首五言古诗。此诗描写了一条青溪的幽秀景色，诗人用多彩的画笔，绘出青溪流经不同地方时呈现的不同画面。其中“声喧乱石中，色静深松里”两句，以喧响的声音和幽冷的色调形成闹与静的强烈对比，如同一幅“有声画”。诗的末四句写出诗人心境的闲谈正如清川的闲淡，把自己的精神和自然的精神融和起来，意味隽永。全诗自然清淡素雅，写景抒情皆轻轻松松，然而韵味却隽永醇厚。诗人笔下的青溪是喧闹与沉郁的统一，活泼与安详的揉合，幽深与素静的融和。";
 			byte[] bytes = msg.getBytes("UTF-8");
-			Native enc = new Native() {
+			// encrypt
+			Native enc = new Native();
+			byte[] key = enc.generateAesKey(256);
+			byte[] iv = enc.generateAesIV();
+			ReadCallback readCallback = new ReadCallback() {
 				int readLength = 0;
-
 				@Override
-				public byte[] readCallback(int length) {
+				public byte[] read(int length) {
 					int size = Math.min(length, bytes.length - readLength);
 					if (size == 0) return null;
 					return Arrays.copyOfRange(bytes, readLength, readLength += size);
 				}
 			};
-
-			byte[] key = enc.generateAesKey(256);
-			byte[] iv = enc.generateAesIV();
-			byte[] enc_msg = enc.aesEncrypt(1024 * 64, key, iv, 2);
-			assertTrue(enc_msg != null, "encrypt message is not null");
-
-			Native dec = new Native() {
+			ByteArrayList encRes = new ByteArrayList();
+			WriteCallback writeCallback = (bs) -> encRes.add(bs);
+			enc.aesEncrypt(1024 * 64, key, iv, 2, readCallback, writeCallback);
+			byte[] encMsg = encRes.toArray();
+			assertTrue(encMsg != null, "encrypt message is not null");
+			// decrypt
+			Native dec = new Native();
+			ReadCallback readCallback1 = new ReadCallback() {
 				int readLength = 0;
-
 				@Override
-				public byte[] readCallback(int length) {
-					int size = Math.min(length, enc_msg.length - readLength);
+				public byte[] read(int length) {
+					int size = Math.min(length, encMsg.length - readLength);
 					if (size == 0) return null;
-					return Arrays.copyOfRange(enc_msg, readLength, readLength += size);
+					return Arrays.copyOfRange(encMsg, readLength, readLength += size);
 				};
 			};
+			ByteArrayList decRes = new ByteArrayList();
+			WriteCallback writeCallback1 = (bs) -> decRes.add(bs);
+			dec.aesDecrypt(1024 * 64 * 10, key, iv, 2, readCallback1, writeCallback1);
+			byte[] decMsg = decRes.toArray(); 
+			assertTrue(decMsg != null, "decrypt message is not null");
 
-			byte[] dec_msg = dec.aesDecrypt(1024 * 64 * 10, key, iv, 2);
-			assertTrue(dec_msg != null, "decrypt message is not null");
-
-			String m = new String(dec_msg, "UTF-8");
+			String m = new String(decMsg, "UTF-8");
 			assertTrue(msg.equals(m), "msg after encrypt ,decrypt are the same!");
 		} catch (Exception e) {
 			assertInstanceOf(UnsupportedEncodingException.class, e, "Unsupported encoding exception");

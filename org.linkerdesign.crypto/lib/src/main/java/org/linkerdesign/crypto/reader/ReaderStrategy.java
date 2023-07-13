@@ -1,9 +1,8 @@
 package org.linkerdesign.crypto.reader;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
-import org.linkerdesign.crypto.abstraction.ExportType;
+import org.linkerdesign.crypto.abstraction.EncodingType;
 import org.linkerdesign.crypto.abstraction.Reader;
 
 /**
@@ -16,10 +15,8 @@ public class ReaderStrategy implements Reader {
    * reader strategy constructor
    * @param text text
    * @param exportType encoding
-   * @throws UnsupportedEncodingException UnsupportedEncoding
    */
-  public ReaderStrategy(String text, ExportType exportType)
-    throws UnsupportedEncodingException {
+  public ReaderStrategy(String text, EncodingType exportType) {
     switch(exportType) {
       case Base64:
         _reader = new Base64Reader(text);
@@ -31,7 +28,7 @@ public class ReaderStrategy implements Reader {
         _reader = new Utf8Reader(text);
         break;
       default:
-        throw new UnsupportedEncodingException();
+        _reader = new Base64Reader(text);
     }
   }
 
@@ -49,13 +46,6 @@ public class ReaderStrategy implements Reader {
    */
   public ReaderStrategy(byte[] bytes) {
     _reader = new RawReader(bytes);
-  }
-
-  /**
-   * length of data
-   */
-  public long getLength() {
-    return _reader.getLength();
   }
 
   /**

@@ -3,6 +3,7 @@ package org.linkerdesign.crypto;
 /**
  * Readcallback of native
  */
+@FunctionalInterface
 public interface ReadCallback {
   /**
    * native data read callback
