@@ -1,11 +1,7 @@
 package org.linkerdesign.crypto.loader;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,17 +16,20 @@ public class NativeLoader {
    */
   public static String TEMPORARY_DIR_NAME = "org.linkerdesign.crypto.lib";
 
-  private static File tempDir;
+  private static File _tempDir;
 
-  private String tempDirName;
+  private String _tempDirName;
 
-  private Map<OsType, List<String>> libraries;
+  private Map<OsType, List<String>> _libraries;
+
+  private List<LibraryLoader> _loaders;
 
   /**
    * constructor
    */
   public NativeLoader() {
-    this(TEMPORARY_DIR_NAME, new HashMap<OsType, List<String>>());
+    this(new ArrayList<>(), TEMPORARY_DIR_NAME, new HashMap<OsType, List<String>>());
+    addLoader(new JarResourceLibraryLoader());
   }
 
   /**
@@ -38,9 +37,13 @@ public class NativeLoader {
    * @param tempDirName temporary dir name
    * @param libraries native libraries
    */
-  public NativeLoader(String tempDirName, Map<OsType, List<String>> libraries) {
-    this.tempDirName = tempDirName;
-    this.libraries = libraries;
+  public NativeLoader(
+    List<LibraryLoader> loaders,
+    String tempDirName, 
+    Map<OsType, List<String>> libraries) {
+    _loaders = loaders;
+    _tempDirName = tempDirName;
+    _libraries = libraries;
   }
 
   /**
@@ -48,101 +51,145 @@ public class NativeLoader {
    * @param type os type
    * @param path base path to the library
    * @param libraryNames list of library names
+   * @return native loader
    */
-  public void addLibrary(OsType type, String path, List<String> libraryNames) {
-    if (!libraries.containsKey(type)) {
-      libraries.put(type, new ArrayList<String>());
+  public NativeLoader addLibrary(OsType type, String path, List<String> libraryNames) {
+    if (!_libraries.containsKey(type)) {
+      _libraries.put(type, new ArrayList<String>());
     }
-    List<String> list =  libraries.get(type);
+    List<String> list =  _libraries.get(type);
     for(String libraryName : libraryNames) {
-      String libraryPath = Utils.joinResourcePath(path, libraryName);
+      String libraryPath = joinPath(path, libraryName);
       if (!list.contains(libraryPath)) list.add(libraryPath);
     }
+    return this;
   }
 
   /**
    * add windows native libraries
    * @param path the base path
    * @param libraryNames library names
+   * @return native loader
    */
-  public void addWindowsLibraries(String path, List<String> libraryNames) {
-    addLibrary(OsType.WINDOWS, path, libraryNames);
+  public NativeLoader addWindowsLibraries(String path, List<String> libraryNames) {
+    return addLibrary(OsType.WINDOWS, path, libraryNames);
   }
 
   /**
    * add linux native libraries
    * @param path the base path
    * @param libraryNames library names
+   * @return native loader
    */
-  public void addLinuxLibraries(String path, List<String> libraryNames) {
-    addLibrary(OsType.LINUX, path, libraryNames);
+  public NativeLoader addLinuxLibraries(String path, List<String> libraryNames) {
+    return addLibrary(OsType.LINUX, path, libraryNames);
   }
 
   /**
    * add mac native libraries
    * @param path the base path
    * @param libraryNames library names
+   * @return native loader
    */
-  public void addMacLibraries(String path, List<String> libraryNames) {
-    addLibrary(OsType.MACOS, path, libraryNames);
+  public NativeLoader addMacLibraries(String path, List<String> libraryNames) {
+    return addLibrary(OsType.MACOS, path, libraryNames);
   }
 
   /**
-   * load native library from jar file
-   * @throws IOException IO exception
+   * add loader
+   * @param loader library loader
+   * @return native loader
    */
-  public void loadFromJar() throws IOException {
-    OsType osType = OS.get();
-    List<String> libs = libraries.get(osType);
-    if (null == libs) return;
-    for(String lib : libs) {
-      loadFromJar(lib);
+  public NativeLoader addLoader(LibraryLoader loader) {
+    if (!_loaders.contains(loader)) {
+      _loaders.add(loader);
     }
+    return this;
+  }
+
+  /**
+   * remove loader
+   * @param loader loader
+   */
+  public NativeLoader removeLoader(LibraryLoader loader) {
+    _loaders.remove(loader);
+    return this;
+  }
+
+  /**
+   * clear loaders
+   * @return native loader
+   */
+  public NativeLoader clearLoader() {
+    _loaders.clear();
+    return this;
   }
 
   /**
    * load native library from jar file
-   * @param path the path to the library
+   */
+  public boolean load() {
+    try {
+      LoaderContext context = getLoaderContext();
+      for (LibraryLoader loader : _loaders) {
+        if (!loader.load(context)) return false;
+      }
+    } catch (Exception e) {
+      System.err.println(e);
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * construct loader context
+   * @return loader context
+   * @throws IOException io exception(Could not create temp dir)
+   * @throws Exception exception (Could not found libraries for current os)
+   */
+  private LoaderContext getLoaderContext() 
+    throws IOException, Exception {
+    File tempDir =  ensureTempDirExist();
+    List<String> libraries = getLibraries();
+    return new LoaderContext(tempDir, libraries);
+  }
+
+  /**
+   * create temporary dir if not exist
+   * @return temporary dir
    * @throws IOException io exception
    */
-  public void loadFromJar(String path) throws IOException {
-    if (null == path || !path.startsWith("/")) {
-      throw new IllegalArgumentException("The path has to be absolute (start with '/').");
+  private File ensureTempDirExist() throws IOException {
+    if (null == _tempDir) {
+      _tempDir = Utils.createTempDirectory(_tempDirName);
+      _tempDir.deleteOnExit();
     }
-    
-    if (tempDir == null) {
-      tempDir = Utils.createTempDirectory(tempDirName);
-      tempDir.deleteOnExit();
+    return _tempDir;
+  }
+
+  /**
+   * get libraries for current os
+   * @return libraries for current os
+   * @throws Exception exception
+   */
+  private List<String> getLibraries() throws Exception {
+    OsType osType = OS.get();
+    List<String> libs = _libraries.get(osType);
+    if (null == libs) 
+      throw new Exception("not found libraries for the" + osType.name());
+    return libs;
+  }
+
+  /**
+   * join path
+   * @param path the base path
+   * @param fileName name
+   * @return path
+   */
+  private String joinPath(String path, String fileName) {
+    if (!path.endsWith("/")) {
+      path += "/";
     }
-
-    String[] parts = path.split("/");
-    String filename = (parts.length > 1) ? parts[parts.length - 1] : null;
-
-    // Check if the filename is okay
-    if (filename == null) {
-      throw new IllegalArgumentException("The filename has to be at least 3 characters long.");
-    }
-
-    File temp = new File(tempDir, filename);
-
-    try (InputStream is = NativeLoader.class.getResourceAsStream(path)) {
-      Files.copy(is, temp.toPath(), StandardCopyOption.REPLACE_EXISTING);
-    } catch (IOException e) {
-      temp.delete();
-      throw e;
-    } catch (NullPointerException e) {
-      temp.delete();
-      throw new FileNotFoundException("File " + path + "was not found inside jar");
-    }
-
-    try {
-      System.load(temp.getAbsolutePath());
-    } finally {
-      if(Utils.isPosixCompliant()) {
-        temp.delete();
-      } else {
-        temp.deleteOnExit();
-      }
-    }
+    return path + fileName;
   }
 }

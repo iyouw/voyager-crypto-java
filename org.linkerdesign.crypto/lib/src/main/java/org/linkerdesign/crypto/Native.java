@@ -16,14 +16,9 @@ class Native {
   public native int aesDecrypt(int bufferLength, byte[] key, byte[] iv, int aesMode, ReadCallback readCallback, WriteCallback writeCallback);
 
   static {
-    try {
-      NativeLoader loader = new NativeLoader();
-      loader.addWindowsLibraries("/native/win", List.of("libcrypto-3-x64.dll","kcrypto.dll"));
-      loader.addLinuxLibraries("/native/linux", List.of("libcrypto.so.3","libkcrypto.so"));
-      loader.loadFromJar();
-    } catch (Exception e) {
-      System.err.println(e);
-      System.exit(-1);
-    }
+    new NativeLoader()
+      .addWindowsLibraries("/native/win", List.of("libcrypto-3-x64.dll","kcrypto.dll"))
+      .addLinuxLibraries("/native/linux", List.of("libcrypto.so.3","libkcrypto.so"))
+      .load();
   }
 }

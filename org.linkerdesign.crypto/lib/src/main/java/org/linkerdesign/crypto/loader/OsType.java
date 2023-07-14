@@ -4,7 +4,7 @@ enum OsType {
   /**
    * window os type
    */
-  WINDOWS (1) {
+  WINDOWS {
     @Override
     public boolean isWindows() {
       return true;
@@ -18,7 +18,7 @@ enum OsType {
   /**
    * linux os type
    */
-  LINUX (2) {
+  LINUX {
     @Override
     public boolean isLinux() {
       return true;
@@ -37,7 +37,7 @@ enum OsType {
   /**
    * mac os type
    */
-  MACOS (3) {
+  MACOS {
     @Override
     public boolean isMacOS() {
       return true;
@@ -56,9 +56,7 @@ enum OsType {
   /**
    * unknow os type
    */
-  UNKNOW (186);
-
-  private Integer _value;
+  UNKNOW;
 
   String getPrefix() { return ""; }
 
@@ -97,15 +95,5 @@ enum OsType {
       name += suffix;
     }
     return name;
-  }
-
-  /**
-   * get os type value
-   * @return os type value
-   */
-  public Integer getValue() { return _value; }
-
-  private OsType(Integer value) {
-    _value = value;
   }
 }

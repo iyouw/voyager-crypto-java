@@ -1,5 +1,8 @@
 package org.linkerdesign.crypto.symmetricencryptdecrypt;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.linkerdesign.crypto.abstraction.AesKeySize;
 import org.linkerdesign.crypto.abstraction.AesMode;
 import org.linkerdesign.crypto.abstraction.EncodingType;
@@ -100,11 +103,49 @@ public class Aes extends AesBase {
   }
 
   /**
-   * aes decrypt. the key and iv are base64 encoded
+   * aes encrypt
    * @param key aes key
    * @param iv aes iv
    * @param data plain data
-   * @return encrypted data
+   * @param exportType result encoding
+   * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
+   * @return the encrypt result
+   */
+  public String encrypt(byte[] key, byte[] iv, byte[] data, EncodingType exportType, int bufferSize) {
+    return encryptCore(data, key, iv, getMode(), exportType, bufferSize);
+  }
+
+  /**
+   * aes encrypt
+   * @param key aes key
+   * @param iv aes iv
+   * @param data plain data
+   * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
+   * @return the encrypt result
+   */
+  public byte[] encrypt(byte[] key, byte[] iv, byte[] data, int bufferSize) {
+    return encryptCore(data, key, iv, getMode(), bufferSize);
+  }
+
+  /**
+   * aes encrypt 
+   * @param output output stream
+   * @param key aes key
+   * @param iv aes iv
+   * @param data plain data
+   * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
+   */
+  public void encrypt(OutputStream output, byte[] key, byte[] iv, InputStream data, int bufferSize) {
+    encryptCore(output, data, key, iv, getMode(), bufferSize);
+  }
+
+
+  /**
+   * aes decrypt. the key and iv are base64 encoded
+   * @param key aes key
+   * @param iv aes iv
+   * @param data encrypted data
+   * @return plain data
    */
   public byte[] decrypt(String key, String iv, byte[] data) {
     return decrypt(key, iv, data, EncodingType.Base64, EncodingType.Base64, DEFAULT_BUFFER_SIZE);
@@ -114,9 +155,9 @@ public class Aes extends AesBase {
    * aes decrypt. the key and iv are base64 encoded
    * @param key aes key
    * @param iv aes iv
-   * @param data plain data
+   * @param data encrypted data
    * @param exportType the result encoding
-   * @return encrypted data
+   * @return plain data
    */
   public String decrypt(String key, String iv, byte[] data, EncodingType exportType) {
     return decryptCore(data, key, EncodingType.Base64, iv, EncodingType.Base64, getMode(), exportType, DEFAULT_BUFFER_SIZE);
@@ -126,14 +167,51 @@ public class Aes extends AesBase {
    * aes decrypt.
    * @param key aes key
    * @param iv aes iv
-   * @param data plain data
+   * @param data encrypted data
    * @param keyType key encoded type(base64, hex, utf8) 
    * @param ivType iv encoded type(base64, hex, utf8)
    * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
-   * @return encrypted data
+   * @return plain data
    */
   public byte[] decrypt(String key, String iv, byte[] data, EncodingType keyType, EncodingType ivType, int bufferSize) {
     return decryptCore(data, key, keyType, iv, ivType, getMode(), bufferSize);
+  }
+
+  /**
+   * aes decrypt 
+   * @param key aes key
+   * @param iv aes iv
+   * @param data encrypted data
+   * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
+   * @return plain data
+   */
+  public byte[] decrypt(byte[] key, byte[] iv, byte[] data, int bufferSize) {
+    return decryptCore(data, key, iv, getMode(), bufferSize);
+  }
+
+  /**
+   * aes decrypt
+   * @param key aes key
+   * @param iv aes iv
+   * @param data encrypted data
+   * @param exportType the encoding of plain data
+   * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
+   * @return plain data
+   */
+  public String decrypt(byte[] key, byte[] iv, byte[] data, EncodingType exportType, int bufferSize) {
+    return decryptCore(data, key, iv, getMode(), exportType, bufferSize);
+  }
+  
+  /**
+   * aes decrypt
+   * @param output output stream
+   * @param key aes key
+   * @param iv aes iv
+   * @param data encrypted data stream
+   * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
+   */
+  public void decrypt(OutputStream output, byte[] key, byte[] iv, InputStream data, int bufferSize) {
+    decryptCore(output, data, key, iv, getMode(), bufferSize);
   }
 
   /**

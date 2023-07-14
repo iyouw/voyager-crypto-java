@@ -1,6 +1,7 @@
 package org.linkerdesign.crypto.symmetricencryptdecrypt;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.linkerdesign.crypto.CryptoBase;
 import org.linkerdesign.crypto.ReadCallback;
@@ -29,10 +30,31 @@ public class AesBase extends CryptoBase {
    */
   public byte[] encryptCore(Reader reader, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
     ByteArrayList res = new ByteArrayList();
-    ReadCallback readCallback = (int length) -> reader.read(length);
-    WriteCallback writeCallback = (byte[] bytes) -> res.add(bytes);
+    ReadCallback readCallback = (length) -> reader.read(length);
+    WriteCallback writeCallback = (bytes) -> res.add(bytes);
     aesEncryptNative(bufferSize, key, iv, mode, readCallback, writeCallback);
     return res.toArray();
+  }
+
+  /**
+   * encrypt output stream
+   * @param output output stream
+   * @param reader data reader
+   * @param key aes key
+   * @param iv aes iv
+   * @param mode aes mode
+   * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
+   */
+  public void encryptCore(OutputStream output, Reader reader, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
+    ReadCallback readCallback = (length) -> reader.read(length);
+    WriteCallback writeCallback = (bytes) -> {
+      try {
+        output.write(bytes);
+      } catch (Exception e) {
+        System.err.println(e);
+      }
+    };
+    aesEncryptNative(bufferSize, key, iv, mode, readCallback, writeCallback);
   }
 
   /**
@@ -213,6 +235,41 @@ public class AesBase extends CryptoBase {
   }
 
   /**
+   * aes encrypt with output stream
+   * @param output output stream
+   * @param data data
+   * @param key aes key
+   * @param iv aes iv
+   * @param mode aes mode
+   * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
+   */
+  public void encryptCore(OutputStream output, InputStream data, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
+    Reader reader = new ReaderStrategy(data);
+    encryptCore(output, reader, key, iv, mode, bufferSize);
+  }
+
+  /**
+   *  aes encrypt
+   * @param output output stream
+   * @param data data
+   * @param key aes key
+   * @param keyType key encoding
+   * @param iv aes iv
+   * @param ivType iv encoding
+   * @param mode aes mode
+   * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
+   */
+  public void encryptCore(OutputStream output, InputStream data, String key, EncodingType keyType, String iv, EncodingType ivType, AesMode mode, int bufferSize) {
+    BinaryDecodeStrategy strategy = new BinaryDecodeStrategy(keyType);
+    byte[] keyData = strategy.decode(key);
+
+    strategy = new BinaryDecodeStrategy(ivType);
+    byte[] ivData = strategy.decode(iv);
+
+    encryptCore(output, data, keyData, ivData, mode, bufferSize);
+  }
+
+  /**
    * aes encrypt with string result
    * @param data data
    * @param key aes key
@@ -261,6 +318,27 @@ public class AesBase extends CryptoBase {
     WriteCallback writeCallback = (byte[] bytes) -> res.add(bytes);
     aesDecryptNative(bufferSize, key, iv, mode, readCallback, writeCallback);
     return res.toArray();
+  }
+
+  /**
+   * aes decrypt
+   * @param output output stream
+   * @param reader reader
+   * @param key aes key
+   * @param iv aes iv
+   * @param mode aes mode
+   * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
+   */
+  public void decryptCore(OutputStream output, Reader reader, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
+    ReadCallback readCallback = (int length) -> reader.read(length);
+    WriteCallback writeCallback = (bytes) -> {
+      try {
+        output.write(bytes);
+      } catch (Exception e) {
+        System.err.println(e);
+      }
+    };
+    aesDecryptNative(bufferSize, key, iv, mode, readCallback, writeCallback);
   }
 
   /**
@@ -438,6 +516,41 @@ public class AesBase extends CryptoBase {
     byte[] ivData = strategy.decode(iv);
 
     return decryptCore(data, keyData, ivData, mode, bufferSize);
+  }
+
+  /**
+   * aes decrypt with stream data
+   * @param output output stream
+   * @param data plain data
+   * @param key aes key
+   * @param iv aes iv
+   * @param mode aes mode
+   * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
+   */
+  public void decryptCore(OutputStream output, InputStream data, byte[] key, byte[] iv, AesMode mode, int bufferSize) {
+    Reader reader = new ReaderStrategy(data);
+    decryptCore(output, reader, key, iv, mode, bufferSize);
+  }
+
+  /**
+   * aes decrypt with stream data
+   * @param output output stream
+   * @param data plain data
+   * @param key aes key
+   * @param keyType key encoding
+   * @param iv iv 
+   * @param ivType iv encoding
+   * @param mode aes mode
+   * @param bufferSize native buffer size, which could turn the performance of decrypt algorithm
+   */
+  public void decryptCore(OutputStream output, InputStream data, String key, EncodingType keyType, String iv, EncodingType ivType, AesMode mode, int bufferSize) {
+    BinaryDecodeStrategy strategy = new BinaryDecodeStrategy(keyType);
+    byte[] keyData = strategy.decode(key);
+
+    strategy = new BinaryDecodeStrategy(ivType);
+    byte[] ivData = strategy.decode(iv);
+
+    decryptCore(output, data, keyData, ivData, mode, bufferSize);
   }
 
   /**

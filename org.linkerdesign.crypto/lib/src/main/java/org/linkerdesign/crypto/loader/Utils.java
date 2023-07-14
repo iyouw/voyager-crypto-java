@@ -35,17 +35,4 @@ class Utils {
       throw new IOException("Failed to create temp dir" + dir.getName());
     return dir;
   }
-
-  /**
-   * join library path
-   * @param path the base path
-   * @param fileName library name
-   * @return library path
-   */
-  public static String joinResourcePath(String path, String fileName) {
-    if (!path.endsWith("/")) {
-      path += "/";
-    }
-    return path + fileName;
-  }
 }
