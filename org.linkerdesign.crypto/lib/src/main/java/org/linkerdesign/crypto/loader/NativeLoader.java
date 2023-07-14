@@ -34,6 +34,7 @@ public class NativeLoader {
 
   /**
    * constructor
+   * @param loaders library loaders
    * @param tempDirName temporary dir name
    * @param libraries native libraries
    */
@@ -110,6 +111,7 @@ public class NativeLoader {
   /**
    * remove loader
    * @param loader loader
+   * @return native loader
    */
   public NativeLoader removeLoader(LibraryLoader loader) {
     _loaders.remove(loader);
@@ -127,6 +129,7 @@ public class NativeLoader {
 
   /**
    * load native library from jar file
+   * @return whether load successful.
    */
   public boolean load() {
     try {
