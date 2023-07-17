@@ -3,6 +3,8 @@
 
 #include <openssl/evp.h>
 
+#define MAX_REF_PER_FRAME 6
+
 enum AES_MODE {
   CTR = 1,
   CBC,

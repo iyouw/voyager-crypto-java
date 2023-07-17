@@ -45,12 +45,24 @@ JNIEXPORT jbyteArray JNICALL Java_org_linkerdesign_crypto_Native_digest(
   if (NULL == (message = (unsigned char *)malloc(bufferLength)))
     goto err;
 
-  while (NULL != (read_bytes = (jbyteArray)(*env)->CallObjectMethod(env, readCallback, mid, bufferLength)))
+  while (1)
   {
+    // create nested scope
+    if ((*env)->PushLocalFrame(env, MAX_REF_PER_FRAME) < 0)
+      goto err;
+    
+    if(NULL == (read_bytes = (jbyteArray)(*env)->CallObjectMethod(env, readCallback, mid, bufferLength)))
+    {
+      (*env)->PopLocalFrame(env, NULL);
+      break;
+    }
+
     read_byte_len = (*env)->GetArrayLength(env,read_bytes);
     as_unsigned_char_array_ex(message, env, read_bytes);
     if (1 != EVP_DigestUpdate(ctx, message, read_byte_len))
       goto err;
+
+    (*env)->PopLocalFrame(env, NULL);
   }
   
   if (NULL == (digest = OPENSSL_malloc(EVP_MD_size(type))))
@@ -170,19 +182,30 @@ JNIEXPORT jint JNICALL Java_org_linkerdesign_crypto_Native_aesEncrypt(
   if (1 != EVP_EncryptInit_ex(ctx, cipher, NULL, key_buf, iv_buf))
     goto err;
 
-  while(NULL != (read_bytes = (jbyteArray)(*env)->CallObjectMethod(env, readCallback, readCallbackMid, (jint)read_block_size)))
+  while(1)
   {
+    if ((*env)->PushLocalFrame(env, MAX_REF_PER_FRAME) < 0)
+      goto err;
+    
+    if (NULL == (read_bytes = (jbyteArray)(*env)->CallObjectMethod(env, readCallback, readCallbackMid, (jint)read_block_size)))
+    {
+      (*env)->PopLocalFrame(env, NULL);
+      break;
+    }
+
     read_len = (*env)->GetArrayLength(env, read_bytes);
     as_unsigned_char_array_ex(plaintext, env, read_bytes);
     if (1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, read_len))
       goto err;
-    (*env)->CallObjectMethod(env, writeCallback, writeCallbackMid, as_jbyte_array(env, ciphertext, len, 0));
+    (*env)->CallVoidMethod(env, writeCallback, writeCallbackMid, as_jbyte_array(env, ciphertext, len, 0));
+
+    (*env)->PopLocalFrame(env, NULL);
   }
 
   if(1 != EVP_EncryptFinal_ex(ctx, ciphertext, &len))
     goto err;
 
-  (*env)->CallObjectMethod(env, writeCallback, writeCallbackMid, as_jbyte_array(env, ciphertext, len, 0));
+  (*env)->CallVoidMethod(env, writeCallback, writeCallbackMid, as_jbyte_array(env, ciphertext, len, 0));
 
   EVP_CIPHER_CTX_free(ctx);
   free(plaintext);
@@ -265,19 +288,30 @@ JNIEXPORT jint JNICALL Java_org_linkerdesign_crypto_Native_aesDecrypt(
   if (1 != EVP_DecryptInit_ex(ctx, cipher, NULL, key_buf, iv_buf))
     goto err;
 
-  while(NULL != (read_bytes = (jbyteArray)(*env)->CallObjectMethod(env, readCallback, readCallbackMid, (jint)read_block_size)))
+  while(1)
   {
+    if ((*env)->PushLocalFrame(env, MAX_REF_PER_FRAME) < 0)
+      goto err;
+    
+    if (NULL == (read_bytes = (jbyteArray)(*env)->CallObjectMethod(env, readCallback, readCallbackMid, (jint)read_block_size)))
+    {
+      (*env)->PopLocalFrame(env, NULL);
+      break;
+    }
+
     read_len = (*env)->GetArrayLength(env, read_bytes);
     as_unsigned_char_array_ex(ciphertext, env, read_bytes);
     if (1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, read_len))
       goto err;
-    (*env)->CallObjectMethod(env, writeCalback, writeCallbackMid, as_jbyte_array(env, plaintext, len, 0));
+    (*env)->CallVoidMethod(env, writeCalback, writeCallbackMid, as_jbyte_array(env, plaintext, len, 0));
+
+    (*env)->PopLocalFrame(env, NULL);
   }
 
   if(1 != EVP_DecryptFinal_ex(ctx, plaintext, &len))
     goto err;
   
-  (*env)->CallObjectMethod(env, writeCalback, writeCallbackMid, as_jbyte_array(env, plaintext, len, 0));
+  (*env)->CallVoidMethod(env, writeCalback, writeCallbackMid, as_jbyte_array(env, plaintext, len, 0));
 
   EVP_CIPHER_CTX_free(ctx);
   free(plaintext);
